@@ -126,6 +126,10 @@ class FlyingAttackGameObject extends AnimatedGameObject
       }
     }
 
+    if (other is Sensor) {
+      return;
+    }
+
     _destroyObject();
     super.onCollision(intersectionPoints, other);
   }

@@ -1,6 +1,6 @@
 name: bonfire
 description: (RPG maker) Create RPG-style or similar games more simply with Flame.
-version: 3.15.1
+version: 3.16.0
 homepage: https://bonfire-engine.github.io
 repository: https://github.com/RafaelBarbosatec/bonfire
 issue_tracker: https://github.com/RafaelBarbosatec/bonfire/issues
@@ -26,7 +26,25 @@ dependencies:
 
 dev_dependencies:
   flame_lint: ^1.2.1
-  flutter_test:
+  flutter_test:# Description
+
+*Replace this paragraph with a description of what this PR is doing. If you're modifying existing behavior, describe the existing behavior, how this PR is changing it, and what motivated the change. If this is a breaking change, specify explicitly which APIs have been changed*
+
+## Checklist
+
+Before you create this PR confirm that it meets all requirements listed below by checking the relevant checkboxes (`[x]`). This will ensure a smooth and quick review process.
+
+- [ ] I open this PR to the `develop` branch.
+- [ ] I have added a description of the change under `[next]` in `CHANGELOG.md`.
+- [ ] I ran `dart format --output=none --set-exit-if-changed .` and has success.
+
+## Breaking Change
+
+Does your PR require Flame users to manually update their apps to accommodate your change?
+
+- [ ] Yes, this is a breaking change (please indicate a breaking change in `CHANGELOG.md`).
+- [ ] No, this is *not* a breaking change.
+
     sdk: flutter
 
 flutter:

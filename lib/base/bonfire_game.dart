@@ -324,7 +324,7 @@ abstract class BonfireGame extends BaseGame implements BonfireGameInterface {
 
   /// reorder components by priority
   void _updateOrderPriority() {
-    world.children.rebalanceAll();
+    world.rebalanceChildren();
     _highestPriority = world.children.last.priority;
   }
 

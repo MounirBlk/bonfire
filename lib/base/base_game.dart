@@ -14,22 +14,38 @@ abstract class BaseGame extends FlameGame
   BaseGame({super.world, super.camera});
   bool enabledGestures = true;
   bool enabledKeyboard = true;
-  Iterable<PointerDetectorHandler> _gesturesComponents = [];
+  final List<PointerDetectorHandler> _gesturesComponents =
+      <PointerDetectorHandler>[];
 
   @override
   void updateTree(double dt) {
-    _gesturesComponents = [...world.children, ...camera.viewport.children]
-        .where(_hasGesture)
-        .cast<PointerDetectorHandler>();
+    // Reuse the same list to avoid allocations per frame.
+    _gesturesComponents.clear();
+
+    for (final c in world.children) {
+      if (_hasGesture(c)) {
+        _gesturesComponents.add(c as PointerDetectorHandler);
+      }
+    }
+
+    for (final c in camera.viewport.children) {
+      if (_hasGesture(c)) {
+        _gesturesComponents.add(c as PointerDetectorHandler);
+      }
+    }
+
     super.updateTree(dt);
   }
 
   /// to get the components that contain gestures
-  Iterable<KeyboardEventListener> get _keyboardComponents {
-    return [
-      ...world.children.query<KeyboardEventListener>(),
-      ...camera.viewport.children.query<Keyboard>(),
-    ];
+  // Note: we avoid building a combined list here to reduce allocations on key events.
+  Iterable<KeyboardEventListener> get _keyboardComponents sync* {
+    for (final k in world.children.query<KeyboardEventListener>()) {
+      yield k;
+    }
+    for (final k in camera.viewport.children.query<KeyboardEventListener>()) {
+      yield k;
+    }
   }
 
   @override

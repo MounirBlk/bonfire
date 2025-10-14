@@ -1,3 +1,9 @@
+# 3.16.1
+- Performance improvements
+
+# 3.16.0
+- Update flame to 1.32.0
+
 # 3.15.1
 - Fix textSize in `BarLifeComponent`
 - `FlyingAttackGameObject` improvements

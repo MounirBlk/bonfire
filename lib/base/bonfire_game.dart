@@ -41,6 +41,9 @@ abstract class BonfireGame extends BaseGame implements BonfireGameInterface {
   /// Background of the game. This can be a color or custom component
   final GameBackground? background;
 
+  /// Cache of visible components by type
+  final Map<Type, List<GameComponent>> _visibleComponentsCache = {};
+
   /// Used to draw area collision in objects.
   @override
   final bool showCollisionArea;
@@ -171,10 +174,20 @@ abstract class BonfireGame extends BaseGame implements BonfireGameInterface {
   }
 
   bool _gameMounted = false;
+  // Frame counter used to keep per-frame caches valid only for the current
+  // frame. Incremented every update() call.
+  int _frameCounter = 0;
+  // Tracks the frame when a given Type cache was last updated.
+  final Map<Type, int> _visibleComponentsCacheFrame = {};
+
   @override
   void update(double dt) {
     super.update(dt);
     _intervalUpdateOder.update(dt);
+    // Increment frame counter so per-frame caches are invalidated on the
+    // next frame. This keeps cache valid for the entire frame and avoids
+    // repeated recomputation when multiple queries happen in the same frame.
+    _frameCounter = _frameCounter + 1;
     final containsChildren = camera.world?.children.isNotEmpty == true;
     if (!_gameMounted && containsChildren) {
       _gameMounted = true;
@@ -184,7 +197,20 @@ abstract class BonfireGame extends BaseGame implements BonfireGameInterface {
 
   @override
   Iterable<T> visibles<T extends GameComponent>() {
-    return world.children.whereType<T>().where((e) => e.isVisible);
+    final cached = _visibleComponentsCache[T];
+    final cachedFrame = _visibleComponentsCacheFrame[T];
+    if (cached != null && cachedFrame == _frameCounter) {
+      return cached.cast<T>();
+    }
+
+    // Rebuild cache for this type for the current frame.
+    final rebuilt = world.children
+        .whereType<T>()
+        .where((e) => e.isVisible)
+        .toList(growable: false);
+    _visibleComponentsCache[T] = rebuilt.cast<GameComponent>();
+    _visibleComponentsCacheFrame[T] = _frameCounter;
+    return rebuilt;
   }
 
   @override
@@ -359,7 +385,7 @@ abstract class BonfireGame extends BaseGame implements BonfireGameInterface {
   void _updateOrderPriorityMicrotask() {
     if (_shouldUpdatePriority) {
       _shouldUpdatePriority = false;
-      scheduleMicrotask(_updateOrderPriority);
+      _updateOrderPriority();
     }
   }
 
